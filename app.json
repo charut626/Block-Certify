@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "BlockCertify",
+    "slug": "block-certify",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "android": {
+      "package": "com.blockcertify.app",
+      "usesCleartextTraffic": true
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
+    ]
+  }
+}
