@@ -1,7 +1,7 @@
 const Tesseract = require("tesseract.js");
 const Jimp = require("jimp");
 const jsQR = require("jsqr");
-const pdfPoppler = require("pdf-poppler");
+const pdfParse = require("pdf-parse");
 const path = require("path");
 const fs = require("fs");
 
@@ -18,29 +18,11 @@ async function extractText(filePath, mimeType) {
         const isPdf = mimeType === "application/pdf";
 
         if (isPdf) {
-
-            const outputDir = "/tmp";
-            const prefix = path.basename(filePath);
-
-            const options = {
-                format: "png",
-                out_dir: outputDir,
-                out_prefix: prefix,
-                page: 1
-            };
-
-            await pdfPoppler.convert(filePath, options);
-
-            const convertedImage = `${outputDir}/${prefix}-0001.png`;
-
-            const { data: { text } } =
-                await Tesseract.recognize(convertedImage, "eng");
-
-            if (fs.existsSync(convertedImage)) {
-                fs.unlinkSync(convertedImage);
-            }
-
-            return text;
+            
+            const fileBuffer = fs.readFileSync(filePath);
+            const data = await pdfParse(fileBuffer);
+            return data.text;
+            
         }
 
         // Otherwise process normally as image
@@ -67,34 +49,18 @@ async function extractQR(filePath, mimeType) {
     try {
 
         const isPdf = mimeType === "application/pdf";
-        let imagePath = filePath;
 
         if (isPdf) {
-
-            const outputDir = "/tmp";
-            const prefix = path.basename(filePath) + "_qr";
-
-            const options = {
-                format: "png",
-                out_dir: outputDir,
-                out_prefix: prefix,
-                page: 1
-            };
-
-            await pdfPoppler.convert(filePath, options);
-
-            imagePath = `${outputDir}/${prefix}-0001.png`;
+            console.log("Skipping QR code extraction for PDF format on serverless.");
+            return null;
         }
 
+        const imagePath = filePath;
         const image = await Jimp.read(imagePath);
 
         const { data, width, height } = image.bitmap;
 
         const qrData = jsQR(data, width, height);
-
-        if (isPdf && fs.existsSync(imagePath)) {
-            fs.unlinkSync(imagePath);
-        }
 
         return qrData ? qrData.data : null;
 

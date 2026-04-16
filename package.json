@@ -24,7 +24,6 @@
     "multer": "^2.1.1",
     "openai": "^6.33.0",
     "pdf-parse": "^1.1.1",
-    "pdf-poppler": "^0.2.3",
     "pdf2pic": "^3.2.0",
     "qrcode-reader": "^1.0.4",
     "react": "19.2.0",
