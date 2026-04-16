@@ -25,9 +25,16 @@ async function extractText(filePath, mimeType) {
             
         }
 
-        // Otherwise process normally as image
-        const { data: { text } } =
-            await Tesseract.recognize(filePath, "eng");
+        // Initialize Tesseract worker pointing to Vercel's allowed /tmp folder
+        const worker = await Tesseract.createWorker("eng", 1, {
+            cachePath: "/tmp",
+            cacheMethod: "write"
+        });
+        
+        const { data: { text } } = await worker.recognize(filePath);
+        
+        // Terminate worker to free Vercel memory
+        await worker.terminate();
 
         return text;
 

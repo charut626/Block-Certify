@@ -61,19 +61,30 @@ const provider = new ethers.FallbackProvider([
   }
 ]);
 
-const wallet = new ethers.Wallet(
-  process.env.PRIVATE_KEY,
-  provider
-);
+let wallet = null;
+let contract = null;
 
-const contract = new ethers.Contract(
-  process.env.CONTRACT_ADDRESS,
-  abi,
-  wallet
-);
+try {
+  if (process.env.PRIVATE_KEY && process.env.CONTRACT_ADDRESS) {
+    wallet = new ethers.Wallet(
+      process.env.PRIVATE_KEY,
+      provider
+    );
 
-console.log("Connected wallet:", wallet.address);
-console.log("Blockchain connected successfully");
+    contract = new ethers.Contract(
+      process.env.CONTRACT_ADDRESS,
+      abi,
+      wallet
+    );
+
+    console.log("Connected wallet:", wallet.address);
+    console.log("Blockchain connected successfully");
+  } else {
+    console.warn("WARNING: PRIVATE_KEY or CONTRACT_ADDRESS environment variable is missing.");
+  }
+} catch (err) {
+  console.error("Failed to initialize blockchain connection:", err.message);
+}
 
 
 /* ==============================
